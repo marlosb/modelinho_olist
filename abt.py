@@ -24,7 +24,6 @@ def get_abt(DATA_PATH, QUERY_PATH, primeira_safra, ultima_safra):
 
     while primeira_safra_datetime <= ultima_safra_datetime:
         safra = primeira_safra_datetime.strftime("%Y-%m-%d")
-        print(f'primeira safra: {safra}')
         query_exec = query.format( data_ref=safra )
         primeira_safra_datetime = (primeira_safra_datetime
                                    + relativedelta(months=+1))
@@ -41,5 +40,5 @@ def get_abt(DATA_PATH, QUERY_PATH, primeira_safra, ultima_safra):
                                     *
                                     FROM vw_olist_abt_p2;'''
 
-    print(safra)
-    exec_etl(query_exec, con)
+        print(safra)
+        exec_etl(query_exec, con)
