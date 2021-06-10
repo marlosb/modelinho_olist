@@ -169,30 +169,48 @@ def get_models(DATA_PATH, model_path):
     auc_test_rf = metrics.roc_auc_score( y_test, y_test_prob_rf)
     auc_test_xgb = metrics.roc_auc_score( y_test, y_test_prob_xgb)
     auc_test_xgb_nt = metrics.roc_auc_score( y_test, y_test_prob_xgb_nt)
+    
+    # Add all results to a pandas DataFrame
+    all_models = pd.DataFrame(columns=['name', 'modelo', 'auc'],
+            data=[['Regressão Logistica', best_model_rl, auc_test_rl],
+                  ['Tree', best_model_tree, auc_test_tree],
+                  ['Forest', best_model_rf, auc_test_rf],
+                  ['XGB1', best_model_xgb, auc_test_xgb],
+                  ['XGB2', best_model_xgb_nt, auc_test_xgb_nt]])
+    # Sort all models dataframe by AUC result and save it
+    champion_model = all_models.sort_values('auc', 
+                               ascending=False).head(1)['modelo'].item()
+    champion_auc = all_models.sort_values('auc', 
+                                  ascending=False).head(1)['auc'].item()
 
-    best_model_xgb_nt.fit( df_train[num_vars + cat_vars], 
+    champion_model.fit(df_train[num_vars + cat_vars], 
                            df_train[target])
     
     # Verificando erro na base de Out of Time
-    y_test_prob = (best_model_xgb_nt.predict_proba(
+    y_test_prob = (champion_model.predict_proba(
                                     df_oot[num_vars + cat_vars ])[:, 1])
     auc_oot = metrics.roc_auc_score( df_oot[target], y_test_prob)
     print( "Área sob a curva ROC:", auc_oot)
 
-    best_model_xgb_nt.fit(df[num_vars+cat_vars], df[target])
+    champion_model.fit(df[num_vars+cat_vars], df[target])
 
-    features = (best_model_xgb_nt[:-1].transform( df_train[num_vars + 
+    features = (champion_model[:-1].transform( df_train[num_vars + 
                                           cat_vars] ).columns.tolist())
-
-    features_importance = pd.Series(
-           best_model_xgb_nt[-1].feature_importances_, index= features)
+    try:
+        features_importance = pd.Series(
+              champion_model[-1].feature_importances_, index= features)
+    except AttributeError:
+        features_importance = ''
 
     features_importance.sort_values( ascending=False ).head(20)
 
     model_s = pd.Series( {"cat_vars":cat_vars,
                       "num_vars":num_vars,
                       "fit_vars": X_train.columns.tolist(),
-                      "model":best_model_xgb_nt,
-                      "auc":{"test": auc_test_xgb_nt, "oot":auc_oot}} )
+                      "model":champion_model,
+                      "auc":{"test": champion_auc, "oot":auc_oot}} )
 
     model_s.to_pickle(model_path + "best_model_olist_xgb_nt.pkl")
+    champion_name = (all_models.sort_values('auc', 
+                              ascending=False).head(1)['name'].item())
+    return champion_name

@@ -20,14 +20,15 @@ if __name__ == '__main__':
         get_abt(DATA_PATH, QUERY_PATH, primeira_safra, ultima_safra)
     elif '-trainonly' in sys.argv:
         print('Training models')
-        get_models(DATA_PATH, model_path)
+        name = get_models(DATA_PATH, model_path)
     else:
         print('Generating ABT and training models')
         get_abt(DATA_PATH, QUERY_PATH, primeira_safra, ultima_safra)
-        get_models(DATA_PATH, model_path)
+        name = get_models(DATA_PATH, model_path)
     
     end_time = datetime.datetime.now()
     print('==========================================================')
     print('\nScript completo')
+    if name: print(f'Chamption model is {name}')
     print(f'O tempo total foi {end_time - start_time}\n')
     print('==========================================================')
