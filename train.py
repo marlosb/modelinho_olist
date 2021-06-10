@@ -210,7 +210,9 @@ def get_models(DATA_PATH, model_path):
                       "model":champion_model,
                       "auc":{"test": champion_auc, "oot":auc_oot}} )
 
-    model_s.to_pickle(model_path + "best_model_olist_xgb_nt.pkl")
+    now = datetime.datetime.now().strftime('%Y-%m-%d--%H-%M-%S')
+
+    model_s.to_pickle(model_path + f'champion_model_{now}.pkl')
     champion_name = (all_models.sort_values('auc', 
                               ascending=False).head(1)['name'].item())
     return champion_name
