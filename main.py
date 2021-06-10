@@ -1,3 +1,4 @@
+import datetime
 import sys
 
 from abt import get_abt
@@ -12,6 +13,7 @@ primeira_safra = "2018-03-01"
 ultima_safra = "2018-05-01"
 
 if __name__ == '__main__':
+    start_time = datetime.datetime.now()
 
     if '-abtonly' in sys.argv:
         print('Generating ABT')
@@ -23,3 +25,9 @@ if __name__ == '__main__':
         print('Generating ABT and training models')
         get_abt(DATA_PATH, QUERY_PATH, primeira_safra, ultima_safra)
         get_models(DATA_PATH, model_path)
+    
+    end_time = datetime.datetime.now()
+    print('==========================================================')
+    print('\nScript completo')
+    print(f'O tempo total foi {end_time - start_time}\n')
+    print('==========================================================')
